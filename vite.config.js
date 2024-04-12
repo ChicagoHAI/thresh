@@ -2,7 +2,7 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
-const baseUrl = process.env.VITE_BASE_URL || '/';
+const baseUrl = process.env.VITE_BASE_URL || '/thresh/';
 
 export default defineConfig({
   plugins: [
@@ -14,6 +14,6 @@ export default defineConfig({
       vue$: 'vue/dist/vue.esm-bundler.js',
     }
   },
-  base: "/thresh/"
-  // base: process.env.NODE_ENV === 'production' ? baseUrl : '/',
+  // base: "/thresh/"
+  base: process.env.NODE_ENV === 'production' ? baseUrl : '/thresh/',
 })
