@@ -2,7 +2,7 @@
   "name": "salsa",
   "version": "0.0.0",
   "private": true,
-  "homepage": "https://chicagohai.github.io",
+  "homepage": "https://chicagohai.github.io/thresh",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
