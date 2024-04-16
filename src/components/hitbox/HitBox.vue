@@ -285,7 +285,6 @@ export default {
                 const doc_id = 'progress';
 
                 // Get Prolific information if it exists
-                var prolific = null;
                 // if (this.config.crowdsource == "prolific") {
                 const params = new URLSearchParams(window.location.search);
                 var prolific = {
@@ -322,7 +321,7 @@ export default {
 
                 const collection = this.config.database.collection || 'thresh';
                 const doc_id = this.config.database.document || 'annotations';
-                const field_id = this.config.database.field;
+                // const field_id = this.config.database.field;
 
                 // Get Prolific information if it exists
                 const params = new URLSearchParams(window.location.search);
@@ -332,6 +331,8 @@ export default {
                     "exp_id": params.get("EXP_ID") || null,
                     "session_id": params.get("SESSION_ID") || null
                 }
+
+                const field_id =  prolific.cnet_id + "_" +  prolific.exp_id + "_" + prolific.session_id;//this.config.database.field;
 
                 const db = getFirestore(firebaseApp);
                 const docRef = doc(db, collection, doc_id);
@@ -394,7 +395,7 @@ export default {
         <div>
             <div class="ba b--black-80 br2 pa2">
                 <div class="fr">
-                    <!-- <i @click="restart_hit" class="fa-solid fa-arrows-rotate fa-lg pointer mr2"></i> -->
+                    <i @click="restart_hit" class="fa-solid fa-arrows-rotate fa-lg pointer mr2"></i>
                     <i @click="bookmark_hit" class="bookmark fa-regular fa-bookmark fa-lg pointer ml1" :class="get_bookmark_class()"></i>
                 </div>
 
