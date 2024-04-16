@@ -259,9 +259,9 @@ export default {
             }
 
             if (this.config.crowdsource && this.config.crowdsource == "prolific") {
-                let prolific_completion_code = this.config.prolific_completion_code;
-                window.location.href = `https://app.prolific.co/submissions/complete?cc=${prolific_completion_code}`;
-            } else {
+            //     let prolific_completion_code = this.config.prolific_completion_code;
+            //     window.location.href = `https://app.prolific.co/submissions/complete?cc=${prolific_completion_code}`;
+            // } else {
                 alert("You have successfully submitted your annotations.")
             }
         }
