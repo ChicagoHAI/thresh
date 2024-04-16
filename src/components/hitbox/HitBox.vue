@@ -395,7 +395,7 @@ export default {
         <div>
             <div class="ba b--black-80 br2 pa2">
                 <div class="fr">
-                    <i @click="restart_hit" class="fa-solid fa-arrows-rotate fa-lg pointer mr2"></i>
+                    <!-- <i @click="restart_hit" class="fa-solid fa-arrows-rotate fa-lg pointer mr2"></i> -->
                     <i @click="bookmark_hit" class="bookmark fa-regular fa-bookmark fa-lg pointer ml1" :class="get_bookmark_class()"></i>
                 </div>
 
