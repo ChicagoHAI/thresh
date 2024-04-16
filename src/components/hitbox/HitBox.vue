@@ -1,7 +1,7 @@
 <script setup>
   import Sent from "./Sent.vue";
   import _ from 'lodash';
-  import { handle_file_download, handle_file_upload } from "../../assets/js/file-util.js";
+//   import { handle_file_download, handle_file_upload } from "../../assets/js/file-util.js";
   import VueMarkdown from 'vue-markdown-render'
   import { initializeApp } from 'firebase/app'
   import { getFirestore, doc, updateDoc, arrayUnion } from "firebase/firestore";
@@ -213,14 +213,102 @@ export default {
         showConfigToggle() {
           return this.config.hasOwnProperty('display') && Object.values(this.config.display).includes('hide-context') && this.context_exists()
         },
-        file_download() {
-            handle_file_download(this.hits_data)
+        // file_download() {
+        //     handle_file_download(this.hits_data)
+        // },
+        // async file_upload(e) {
+        //     let new_hits_data = await handle_file_upload(e);
+        //     this.set_hits_data(new_hits_data);
+        //     this.set_hit(1);
+        //     this.setup_hit_box();
+        // },
+        restore_progress () {
+            alert("???");
+             // Load data from firebase
+            if (this.config.database && this.config.database.type && this.config.database.type == "firebase") {
+                const firebaseApp = initializeApp({
+                    databaseURL: this.config.database.url,
+                    projectId: this.config.database.project_id,
+                });
+
+                const collection = this.config.database.collection || 'thresh';
+                const doc_id = 'progress'; 
+
+                // Get Prolific information if it exists
+                // if (this.config.crowdsource == "prolific") {
+                const params = new URLSearchParams(window.location.search);
+                var prolific = {
+                    "completion_code": this.config.prolific_completion_code || null,
+                    "cnet_id": params.get("CNET_ID") || null,
+                    "exp_id": params.get("EXP_ID") || null,
+                    "session_id": params.get("SESSION_ID") || null
+                }
+                // }
+
+                const field_id =  prolific.cnet_id + "_" +  prolific.exp_id + "_" + prolific.session_id;//this.config.database.field;
+
+                const db = getFirestore(firebaseApp);
+                // const docRef = doc(db, collection, doc_id);
+
+                // retrieve a document
+                db.collection(collection)
+                .doc(doc_id)
+                .get()
+                .then(snapshot => {
+                    const document = snapshot.data()
+                    // do something with document
+
+                    let saves = document.get(field_id);
+                    let new_hits_data = saves[saves.length - 1].annotations;
+
+                    this.set_hits_data(new_hits_data);
+                    this.set_hit(1);
+                    this.setup_hit_box();
+                })
+
+                alert("You have successfully loaded your annotations.");
+            }
+            alert("Blah.");
+
         },
-        async file_upload(e) {
-            let new_hits_data = await handle_file_upload(e);
-            this.set_hits_data(new_hits_data);
-            this.set_hit(1);
-            this.setup_hit_box();
+        async save_progress () {
+            if (this.config.database && this.config.database.type && this.config.database.type == "firebase") {
+                // Send data to firebase
+                const firebaseApp = initializeApp({
+                    databaseURL: this.config.database.url,
+                    projectId: this.config.database.project_id,
+                });
+
+                const collection = this.config.database.collection || 'thresh';
+                const doc_id = 'progress';
+
+                // Get Prolific information if it exists
+                var prolific = null;
+                // if (this.config.crowdsource == "prolific") {
+                const params = new URLSearchParams(window.location.search);
+                var prolific = {
+                    "completion_code": this.config.prolific_completion_code || null,
+                    "cnet_id": params.get("CNET_ID") || null,
+                    "exp_id": params.get("EXP_ID") || null,
+                    "session_id": params.get("SESSION_ID") || null
+                }
+                // }
+
+                const field_id =  prolific.cnet_id + "_" +  prolific.exp_id + "_" + prolific.session_id;//this.config.database.field;
+
+                const db = getFirestore(firebaseApp);
+                const docRef = doc(db, collection, doc_id);
+
+                await updateDoc(docRef, {
+                    [field_id]: arrayUnion({
+                        "annotations": JSON.stringify(this.hits_data, null, 2),
+                        "time_submitted": new Date().toLocaleString(),
+                        "prolific_metadata": JSON.stringify(prolific, null, 2),
+                    })
+                });
+
+                alert("You have successfully saved your annotations.");
+            }
         },
         async submit_crowsource() {
             if (this.config.database && this.config.database.type && this.config.database.type == "firebase") {
@@ -235,15 +323,12 @@ export default {
                 const field_id = this.config.database.field;
 
                 // Get Prolific information if it exists
-                var prolific = null;
-                if (this.config.crowdsource == "prolific") {
-                    const params = new URLSearchParams(window.location.search);
-                    var prolific = {
-                        "completion_code": this.config.prolific_completion_code || null,
-                        "prolific_pid": params.get("PROLIFIC_PID") || null,
-                        "study_id": params.get("STUDY_ID") || null,
-                        "session_id": params.get("SESSION_ID") || null
-                    }
+                const params = new URLSearchParams(window.location.search);
+                var prolific = {
+                    "completion_code": this.config.prolific_completion_code || null,
+                    "cnet_id": params.get("CNET_ID") || null,
+                    "exp_id": params.get("EXP_ID") || null,
+                    "session_id": params.get("SESSION_ID") || null
                 }
 
                 const db = getFirestore(firebaseApp);
@@ -256,14 +341,15 @@ export default {
                         "prolific_metadata": JSON.stringify(prolific, null, 2),
                     })
                 });
+                alert("You have successfully submitted your annotations.");
             }
 
-            if (this.config.crowdsource && this.config.crowdsource == "prolific") {
+            // if (this.config.crowdsource && this.config.crowdsource == "prolific") {
             //     let prolific_completion_code = this.config.prolific_completion_code;
             //     window.location.href = `https://app.prolific.co/submissions/complete?cc=${prolific_completion_code}`;
             // } else {
-                alert("You have successfully submitted your annotations.")
-            }
+            //     alert("You have successfully submitted your annotations.")
+            // }  
         }
     }
 }
@@ -293,15 +379,15 @@ export default {
 
             <div class="fr hit-file-buttons">
                 <div class="mt1 mr1 fr">
-                    <input type="button" id="download-btn" @click="file_download"/>
-                    <label class="file-upload file-download br-100 w2-5 h2-5 pointer" for="download-btn" :class="{'disabled': config.disable && Object.values(config.disable).includes('download')}"><i class="fa fa-arrow-down"></i></label>
+                    <input type="button" id="download-btn" @click="save_progress"/>
+                    <label class="file-upload file-download br-100 w2-5 h2-5 pointer" for="download-btn" :class="{'disabled': config.disable && Object.values(config.disable).includes('download')}"><i class="fa fa-cloud-arrow-up"></i></label>
                 </div>
 
                 <div class="mt1 mr2 ml2 fr">
-                    <input type="file" id="upload-btn" @change="file_upload"/>
-                    <label class="file-upload br-100 w2-5 h2-5 pointer" for="upload-btn" :class="{'disabled': config.disable && Object.values(config.disable).includes('upload')}"><i class="fa fa-arrow-up"></i></label>
+                    <input type="button" id="upload-btn" @change="restore_progress"/>
+                    <label class="file-upload br-100 w2-5 h2-5 pointer" for="upload-btn" :class="{'disabled': config.disable && Object.values(config.disable).includes('upload')}"><i class="fa fa-cloud-arrow-down"></i></label>
                 </div>
-            </div>            
+            </div>   
         </div>
         <div>
             <div class="ba b--black-80 br2 pa2">
