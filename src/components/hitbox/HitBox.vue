@@ -4,7 +4,7 @@
 //   import { handle_file_download, handle_file_upload } from "../../assets/js/file-util.js";
   import VueMarkdown from 'vue-markdown-render'
   import { initializeApp } from 'firebase/app'
-  import { getFirestore, doc, updateDoc, arrayUnion } from "firebase/firestore";
+  import { getFirestore, doc, updateDoc, arrayUnion, getDoc } from "firebase/firestore";
 </script>
 
 <script>
@@ -213,18 +213,17 @@ export default {
         showConfigToggle() {
           return this.config.hasOwnProperty('display') && Object.values(this.config.display).includes('hide-context') && this.context_exists()
         },
-        // file_download() {
-        //     handle_file_download(this.hits_data)
-        // },
-        // async file_upload(e) {
-        //     let new_hits_data = await handle_file_upload(e);
-        //     this.set_hits_data(new_hits_data);
-        //     this.set_hit(1);
-        //     this.setup_hit_box();
-        // },
-        restore_progress () {
-            alert("???");
-             // Load data from firebase
+        file_download() {
+            handle_file_download(this.hits_data)
+        },
+        async file_upload(e) {
+            let new_hits_data = await handle_file_upload(e);
+            this.set_hits_data(new_hits_data);
+            this.set_hit(1);
+            this.setup_hit_box();
+        },
+        async restore_progress () {
+            //  Load data from firebase
             if (this.config.database && this.config.database.type && this.config.database.type == "firebase") {
                 const firebaseApp = initializeApp({
                     databaseURL: this.config.database.url,
@@ -248,27 +247,30 @@ export default {
                 const field_id =  prolific.cnet_id + "_" +  prolific.exp_id + "_" + prolific.session_id;//this.config.database.field;
 
                 const db = getFirestore(firebaseApp);
-                // const docRef = doc(db, collection, doc_id);
+                const docRef = doc(db, collection, doc_id);
 
-                // retrieve a document
-                db.collection(collection)
-                .doc(doc_id)
-                .get()
-                .then(snapshot => {
-                    const document = snapshot.data()
-                    // do something with document
+                const docSnap = await getDoc(docRef);
 
-                    let saves = document.get(field_id);
-                    let new_hits_data = saves[saves.length - 1].annotations;
+                if (docSnap.exists()) {
+                    let document = docSnap.data();
+                    let saves = document[field_id];
+                    let new_hits_data = JSON.parse(saves[saves.length - 1].annotations);
 
                     this.set_hits_data(new_hits_data);
                     this.set_hit(1);
                     this.setup_hit_box();
-                })
 
-                alert("You have successfully loaded your annotations.");
+                    alert("You have successfully loaded your annotations.");
+
+
+                } else {
+                    // docSnap.data() will be undefined in this case
+                    console.log("No such document!");
+                    alert("No existing saves.");
+                }
+
+                
             }
-            alert("Blah.");
 
         },
         async save_progress () {
@@ -378,21 +380,21 @@ export default {
             </div>
 
             <div class="fr hit-file-buttons">
-                <div class="mt1 mr1 fr">
-                    <input type="button" id="download-btn" @click="save_progress"/>
-                    <label class="file-upload file-download br-100 w2-5 h2-5 pointer" for="download-btn" :class="{'disabled': config.disable && Object.values(config.disable).includes('download')}"><i class="fa fa-cloud-arrow-up"></i></label>
+                <div class="mt1 mr2 ml2 fr" title="Restore last save">
+                    <input type="button" id="upload-btn" @click="restore_progress"/>
+                    <label class="file-upload br-100 w2-5 h2-5 pointer" for="upload-btn" :class="{'disabled': config.disable && Object.values(config.disable).includes('upload')}"><i class="fa fa-cloud-arrow-down"></i></label>
                 </div>
 
-                <div class="mt1 mr2 ml2 fr">
-                    <input type="button" id="upload-btn" @change="restore_progress"/>
-                    <label class="file-upload br-100 w2-5 h2-5 pointer" for="upload-btn" :class="{'disabled': config.disable && Object.values(config.disable).includes('upload')}"><i class="fa fa-cloud-arrow-down"></i></label>
+                <div class="mt1 mr1 fr" title="Save progress">
+                    <input type="button" id="download-btn" @click="save_progress"/>
+                    <label class="file-upload file-download br-100 w2-5 h2-5 pointer" for="download-btn" :class="{'disabled': config.disable && Object.values(config.disable).includes('download')}"><i class="fa fa-cloud-arrow-up"></i></label>
                 </div>
             </div>   
         </div>
         <div>
             <div class="ba b--black-80 br2 pa2">
                 <div class="fr">
-                    <i @click="restart_hit" class="fa-solid fa-arrows-rotate fa-lg pointer mr2"></i>
+                    <!-- <i @click="restart_hit" class="fa-solid fa-arrows-rotate fa-lg pointer mr2"></i> -->
                     <i @click="bookmark_hit" class="bookmark fa-regular fa-bookmark fa-lg pointer ml1" :class="get_bookmark_class()"></i>
                 </div>
 
