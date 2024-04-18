@@ -25,7 +25,8 @@ export default {
 <template>
   <main>
     <section v-if="config.instructions && config.prepend_instructions">
-        <vue-markdown :source=config.instructions :options="options" class="mt0 mb0" />
+        <!-- <vue-markdown :source=config.instructions :options="options" class="mt0 mb0" /> -->
+        <vue-markdown :source=config.instructions class="mt0 mb0" />
         <br /><hr /><br />
     </section>
 

@@ -230,8 +230,9 @@ export default {
                     projectId: this.config.database.project_id,
                 });
 
-                const collection = this.config.database.collection || 'thresh_progress';
+                const collection ='thresh_progress';
                 const doc_id = 'annotations';
+                const domain = this.config.database.domain || '';
 
                 // Get Prolific information if it exists
                 // if (this.config.crowdsource == "prolific") {
@@ -244,8 +245,8 @@ export default {
                 }
                 // }
 
-                const field_id =  prolific.cnet_id + "_" +  prolific.exp_id + "_" + prolific.session_id;//this.config.database.field;
-
+                const field_id =  domain + '_' + prolific.cnet_id;
+                
                 const db = getFirestore(firebaseApp);
                 const docRef = doc(db, collection, doc_id);
 
@@ -281,7 +282,7 @@ export default {
                     projectId: this.config.database.project_id,
                 });
 
-                const collection = this.config.database.collection || 'thresh_progress';
+                const collection = 'thresh_progress';
                 const doc_id = 'annotations';
                 const domain = this.config.database.domain || '';
 
