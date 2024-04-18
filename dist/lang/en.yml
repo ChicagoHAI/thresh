@@ -27,7 +27,7 @@ buttons:
   show_context_label: "Show Context"
   hide_context_label: "Hide Context"
 hit_box:
-  hit_label: "Hit"
+  hit_label: "Task"
 annotation_editor:
   add_edit_header: "Adding an Edit"
   select_edit_header: "Select the Edit Category."
@@ -45,7 +45,7 @@ annotation_viewer:
 questions:
   binary_yes: "Yes"
   binary_no: "No"
-  likert_1: "1 - minor"
+  likert_1: "1 - a little"
   likert_2: "2 - somewhat"
   likert_3: "3 - a lot"
   textbox_placeholder: "Write your answer..."

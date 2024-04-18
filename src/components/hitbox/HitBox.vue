@@ -230,8 +230,8 @@ export default {
                     projectId: this.config.database.project_id,
                 });
 
-                const collection = this.config.database.collection || 'thresh';
-                const doc_id = 'progress'; 
+                const collection = this.config.database.collection || 'thresh_progress';
+                const doc_id = 'annotations';
 
                 // Get Prolific information if it exists
                 // if (this.config.crowdsource == "prolific") {
@@ -281,8 +281,9 @@ export default {
                     projectId: this.config.database.project_id,
                 });
 
-                const collection = this.config.database.collection || 'thresh';
-                const doc_id = 'progress';
+                const collection = this.config.database.collection || 'thresh_progress';
+                const doc_id = 'annotations';
+                const domain = this.config.database.domain || '';
 
                 // Get Prolific information if it exists
                 // if (this.config.crowdsource == "prolific") {
@@ -291,11 +292,11 @@ export default {
                     "completion_code": this.config.prolific_completion_code || null,
                     "cnet_id": params.get("CNET_ID") || null,
                     "exp_id": params.get("EXP_ID") || null,
-                    "session_id": params.get("SESSION_ID") || null
+                    "session_id": params.get("SESSION_ID") || null,
                 }
                 // }
 
-                const field_id =  prolific.cnet_id + "_" +  prolific.exp_id + "_" + prolific.session_id;//this.config.database.field;
+                const field_id =  domain + '_' + prolific.cnet_id;
 
                 const db = getFirestore(firebaseApp);
                 const docRef = doc(db, collection, doc_id);
@@ -321,6 +322,7 @@ export default {
 
                 const collection = this.config.database.collection || 'thresh';
                 const doc_id = this.config.database.document || 'annotations';
+                const domain = this.config.database.domain || '';
                 // const field_id = this.config.database.field;
 
                 // Get Prolific information if it exists
@@ -329,10 +331,10 @@ export default {
                     "completion_code": this.config.prolific_completion_code || null,
                     "cnet_id": params.get("CNET_ID") || null,
                     "exp_id": params.get("EXP_ID") || null,
-                    "session_id": params.get("SESSION_ID") || null
+                    "session_id": params.get("SESSION_ID") || null,
                 }
 
-                const field_id =  prolific.cnet_id + "_" +  prolific.exp_id + "_" + prolific.session_id;//this.config.database.field;
+                const field_id =  domain + '_' + prolific.cnet_id;
 
                 const db = getFirestore(firebaseApp);
                 const docRef = doc(db, collection, doc_id);
